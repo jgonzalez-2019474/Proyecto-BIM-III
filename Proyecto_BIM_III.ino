@@ -1,4 +1,5 @@
 //Librerias
+//Librerias
 #include <Servo.h> // libreria para el servo
 #include <SPI.h> //libreria para el RFID
 #include <MFRC522.h> //Libreria para el RFID
@@ -17,11 +18,9 @@
 #define LED4 5 //LED4 conectado a pin 5 de arduino
 #define LED_Poste1 A0 //LED_Poste1 conectado a pin 14 de arduino 
 #define LED_Poste2 A1 //LED_Poste2 conectado a pin 15 de arduino 
-#define LED_Poste3 A2 //LED_Poste3 conectado a pin 16 de arduino 
-#define LED_Poste4 A3 //LED_Poste4 conectado a pin 17 de arduino 
+#define trig A2 //trig conectado a pin 16 de arduino  
+#define echo A3 //echo conecetado a pin 17 de arduino 
 
-int trig = 2; 
-int echo = 3; 
 int tiempo;
 int distancia;
 
@@ -29,7 +28,7 @@ int distancia;
 void onOffLeds();
 void cerrarPuerta();
 void abrirPuerta();
-void Postes de luz();
+void Postes_de_luz();
 void Talanquera_Salida();
 
 
@@ -56,15 +55,13 @@ void setup()
   pinMode(LED4,OUTPUT); //LED4 como salida
   pinMode(LED_Poste1, OUTPUT); //LED_Poste1 como salida
   pinMode(LED_Poste2, OUTPUT); //LED_Poste2 como salida
-  pinMode(LED_Poste3, OUTPUT); //LED_Poste3 como salida
-  pinMode(LED_Poste4, OUTPUT); //LED_Poste4 como salida
   pinMode(trig, OUTPUT); //trig como salida
   pinMode(echo, INPUT); //echo como entrada
   Servo_Entrada.attach(6); //pin del servo de la talanquera de entrada
   Servo_Puera.attach(8); //pin del servo puerta
   Servo_Salida.attach(7); //pin del servo de la talanquera de salida
   onOffLeds(); //Funcion 
-  Postes de luz(); //Funcion 
+  Postes_de_luz(); //Funcion 
   Serial.begin(9600); //inicio la comunicacion serial  
   SPI.begin(); //Iniciamos el bus SPI
   mfrc522.PCD_Init(); //iniciamos el MFRC522
@@ -133,16 +130,17 @@ void Talanquera_Salida(){
   delay(500); //tiempo de espera
 {
   if (distancia <=10) // si la distancia es menor o igual a 10 el servo se movera a 120 grados
-  ioe.write(120);
+  Servo_Salida.write(120);
   delay(2000); 
   } 
   {
   if (distancia >10); // si la distancia es mayor a 10 el servo se va a mover a 45 grados
-  ioe.write(45);
+  Servo_Salida.write(45);
  } 
 }
 void Postes de luz(){
-  
+  digitalWrite(LED_Poste1, HIGH); //LED del poste en alto 
+  digitalWrite(LED_Poste2, HIGH); //LED del poste en alto
   }
 
 void onOffLeds(){
@@ -164,23 +162,23 @@ void cerrarPuerta(){
    do{
      digitalWrite(LED2,HIGH); //LED2 en alto 
      digitalWrite(LED1,LOW); //LED1 en bajo 
-     angulo = angulo+1; 
-     Servo_Entrada.write(angulo); 
-     delay(50);
-    }while(angulo<90);
-  digitalWrite(LED2,LOW);
-  digitalWrite(LED1,LOW);
+     angulo = angulo+1; //angulo aumenta
+     Servo_Entrada.write(angulo);  
+     delay(50); 
+    }while(angulo<90); //angulo tiene que ser menor a 90 grados
+  digitalWrite(LED2,LOW); //LED2 en bajo 
+  digitalWrite(LED1,LOW); //LED1 en bajo
 }
 
 void abrirPuerta(){
    int angulo=90;
    do{
-     digitalWrite(LED1,HIGH);
-     digitalWrite(LED2,LOW);
-     angulo = angulo-1;
+     digitalWrite(LED1,HIGH); //LED1 en alto 
+     digitalWrite(LED2,LOW); //LED2 en bajo 
+     angulo = angulo-1; //angulo desciende
      Servo_Entrada.write(angulo);
      delay(50);
-    }while(angulo>0);
+    }while(angulo>0); //angulo tiene quye ser mayor a 0 grados
 }
 boolean comparaUID(byte lectura[],byte usuario[]){ // comparacion de los usuarios
   for(byte i=0; i < mfrc522.uid.size; i++){ 
